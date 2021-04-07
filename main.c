@@ -7,6 +7,7 @@
 #include<math.h>
 #include<time.h>
 #include<string.h>
+#include<sys/time.h>
 
 /*array of strings constaining: "The", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog"
  *Totally is 9 words
@@ -57,24 +58,32 @@ int startGame(char ** words, int nums[MAX-1], int i, int scores){
     if(i > MAX) return 0;
     if(nums[i] == 9) return startGame(words, nums, ++i, scores);
     //Print out the task word
-    printf("Type: %s >> \n", words[nums[i]]);
+    printf("Type: %s >> ", words[nums[i]]);
 
     char * hold = NULL;
     int inputSize;
     getline(&hold, &inputSize, stdin);
-    printf("Test: %s", hold);
     
-    scores =  scoreGame(words[nums[i]], hold);
-    if(scores) ++scores;
-    printf("Score: %d", scores);
+    int scoresHold = scoreGame(words[nums[i]], hold);
+    //printf("Score: %d\n", scores);
+    if(scoresHold != 0) {
+        scores += scoresHold;
+    }
+    printf("Score: %d/9\n", scores);
 
     return startGame(words, nums, ++i, scores);
 }
 
 int scoreGame(char * words, char * hold){
+    int len = strlen(words);
     if(words == NULL || hold == NULL) return 0;
-    if(strcmp(words, hold) == 0) return 1; 
-    else return 0;
+    if(strncmp(words,hold,len) == 0){
+        printf("MATCH\n");
+        return 1;
+    }else{
+        return 0;
+    }
+
 }
 
 
@@ -83,15 +92,19 @@ int main(){
     char * words[] = {"The", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog"};
     int i = 0;
     int nums[MAX-1];
+    time_t t0,t1;
+
     srand(time(NULL));
 
     printf("Jack Wanitkun CS201 HW1\n");
 
     createRandom(0, nums);
-    for(int j = 0; j< MAX; ++j){
-        printf("Test: %d\n", nums[j]);
-    }
+
+    gettimeofday(&t0, 0);
     startGame(words, nums, 0, 0);
+    gettimeofday(&t1, 0);
+    int total = (t1 - t0);
+    printf("Total time: %d Seconds\n", total);
 
 
 
